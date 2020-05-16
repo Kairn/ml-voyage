@@ -297,3 +297,8 @@ modules.xml
 # .idea/modules
 # *.iml
 # *.ipr
+
+
+### Custom ###
+**/results/*.csv
+!**/results/res_sample.csv
