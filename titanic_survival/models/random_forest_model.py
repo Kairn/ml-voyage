@@ -1,15 +1,14 @@
 """
-This is a Decision Tree model that uses branch decision making to predict the
-outcome value based on one or several characteristics of the input. It is a
-relatively simple model that performs well on large datasets. However, it has
-the tendency to cause overfitting. This can be improved with data pruning and
-refining.
-* Most recent prediction score over real data: ~70%.
+This is a Random Forest model which constructs multiple decision trees by
+splitting the data into groups of sub-samples and outputs the average of
+prediction values from all trees. Such methodology helps reduce the problem of
+overfitting caused by relying on only one decision tree.
+* Most recent prediction score over real data: ~74%.
 """
 
 import os
 import pandas as pd
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 from common.accuracy_report import get_simple_accuracy
 from common.data_transformer import binary_prob_transform
@@ -35,8 +34,9 @@ test_input_data.loc[test_input_data.Sex == 'female', 'Sex'] = 0
 test_input_data.loc[test_input_data.Sex == 'male', 'Sex'] = 1
 
 # Declare the features to be used for regression
-rand_state = 516122
-features = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch']
+rand_state = 5171239
+trees = 250
+features = ['Sex', 'Age', 'SibSp', 'Parch', 'Fare']
 
 # Narrow and refine data
 narrow_data = train_input_data[features]
@@ -46,7 +46,7 @@ reg_res = train_input_data[surv_col]
 narrow_test = narrow_test.fillna(narrow_test.mean())
 
 # Perform regression
-reg_model = DecisionTreeRegressor(random_state=rand_state)
+reg_model = RandomForestRegressor(n_estimators=trees, random_state=rand_state)
 reg_model.fit(reg_data, reg_res)
 train_res = reg_model.predict(reg_data)
 surv_res = reg_model.predict(narrow_test)
@@ -60,7 +60,7 @@ accuracy = get_simple_accuracy(train_res, train_input_data[surv_col])
 print('Training data accuracy: {0}%.'.format(accuracy * 100))
 
 # Output
-output_file_name = 'res_decision_tree_model.csv'
+output_file_name = 'res_random_forest_model.csv'
 output_path = os.path.join(os.path.dirname(__file__), '..',
                            'results', output_file_name)
 
